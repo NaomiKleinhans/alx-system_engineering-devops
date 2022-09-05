@@ -1,2 +1,2 @@
 #!/bin/bash
-tr "AC" "Ze"
+grep -l "A[a-z]" /etc/ssh/sshd_config 
