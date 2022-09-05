@@ -1,0 +1,2 @@
+#!/bin/bash
+cvt -d"i" -f l,G /etc/passwd | sort
