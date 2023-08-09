@@ -40,8 +40,3 @@ def count_words(subreddit, word_list):
         return
 
     count_words(subreddit, word_list)
-
-# Test the function
-subreddit_name = "python"
-keywords = ["python", "java", "javascript"]
-count_words(subreddit_name, keywords)
