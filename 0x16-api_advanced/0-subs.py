@@ -1,38 +1,18 @@
 #!/usr/bin/python3
-"""
-Module: 0-subs.py
-"""
-
+"""Module for task 0"""
 import requests
 
+
 def number_of_subscribers(subreddit):
-    """
-    Queries the Reddit API and returns the number of subscribers for a given subreddit.
-
-    Args:
-        subreddit (str): The name of the subreddit.
-
-    Returns:
-        int: The number of subscribers for the subreddit, or 0 if invalid.
-    """
-    headers = {
-        'User-Agent': 'Custom User Agent'
-    }
-
-    url = f'https://www.reddit.com/r/{subreddit}/about.json'
-
-    response = requests.get(url, headers=headers)
-
-    if response.status_code == 200:
-        try:
-            data = response.json()
-            subscribers = data['data']['subscribers']
-            return subscribers
-        except (KeyError, ValueError):
-            return 0
-    else:
+    if subreddit is None or type(subreddit) is not str:
         return 0
 
-subreddit_name = "python"
-subscribers = number_of_subscribers(subreddit_name)
-print(f"Subscribers of /r/{subreddit_name}: {subscribers}")
+    base_url = 'https://www.reddit.com/r/{}/about.json'.format(subreddit)
+    headers = {'User-Agent': '0x16-api_advanced_project'}
+    r = requests.get(base_url, headers=headers, allow_redirects=False).json()
+
+    if r.get('data') is None:
+        return 0
+
+    subscribers = r.get('data').get('subscribers')
+    return subscribers
