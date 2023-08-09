@@ -1,77 +1,43 @@
 #!/usr/bin/python3
-
-"""
-Module: 3-count_words.py
-"""
-
 import requests
-import re
+def count_words(subreddit, word_list, word_count={}, after=None):
+    """Queries the Reddit API and returns the count of words in
+    word_list in the titles of all the hot posts
+    of the subreddit"""
+    sub_info = requests.get("https://www.reddit.com/r/{}/hot.json"
+                            .format(subreddit),
+                            params={"after": after},
+                            headers={"User-Agent": "My-User-Agent"},
+                            allow_redirects=False)
+    if sub_info.status_code != 200:
+        return None
 
-def count_words(subreddit, word_list, after=None, word_count={}):
-    """
-    Recursively queries the Reddit API, parses titles of hot articles, and prints a sorted count of keywords.
+    info = sub_info.json()
 
-    Args:
-        subreddit (str): The name of the subreddit.
-        word_list (list): List of keywords to count.
-        after (str): Token for pagination.
-        word_count (dict): Dictionary to store the count of keywords.
+    hot_l = [child.get("data").get("title")
+             for child in info
+             .get("data")
+             .get("children")]
+    if not hot_l:
+        return None
 
-    Returns:
-        None
-    """
-    # Set a custom User-Agent to avoid Too Many Requests errors
-    headers = {
-        'User-Agent': 'Custom User Agent'
-    }
-    
-    # Construct the URL for the subreddit's hot posts with pagination
-    url = f'https://www.reddit.com/r/{subreddit}/hot.json?limit=100'
-    if after:
-        url += f'&after={after}'
-    
-    # Make the API request
-    response = requests.get(url, headers=headers)
-    
-    # Check if the request was successful
-    if response.status_code == 200:
-        try:
-            # Parse the JSON response
-            data = response.json()
-            
-            # Extract the list of posts
-            posts = data['data']['children']
-            
-            # Process titles for keyword count
-            for post in posts:
-                title = post['data']['title'].lower()
-                
-                for word in word_list:
-                    # Use regex to match whole words only (not substrings)
-                    pattern = fr'\b{re.escape(word)}\b'
-                    matches = re.findall(pattern, title)
-                    
-                    if matches:
-                        count = len(matches)
-                        if word in word_count:
-                            word_count[word] += count
-                        else:
-                            word_count[word] = count
-            
-            # Check for pagination
-            after = data['data']['after']
-            if after:
-                return count_words(subreddit, word_list, after, word_count)
-            else:
-                sorted_word_count = sorted(word_count.items(), key=lambda x: (-x[1], x[0]))
-                for word, count in sorted_word_count:
-                    print(f"{word}: {count}")
-        except (KeyError, ValueError):
-            print("None")  # Print None if there was an error parsing the response JSON
+    word_list = list(dict.fromkeys(word_list))
+
+    if word_count == {}:
+        word_count = {word: 0 for word in word_list}
+
+    for title in hot_l:
+        split_words = title.split(' ')
+        for word in word_list:
+            for s_word in split_words:
+                if s_word.lower() == word.lower():
+                    word_count[word] += 1
+
+    if not info.get("data").get("after"):
+        sorted_counts = sorted(word_count.items(), key=lambda kv: kv[0])
+        sorted_counts = sorted(word_count.items(),
+                               key=lambda kv: kv[1], reverse=True)
+        [print('{}: {}'.format(k, v)) for k, v in sorted_counts if v != 0]
     else:
-        print("None")  # Print None if the API request was not successful
-
-# Test the function
-subreddit_name = 'python'
-keywords = ['python', 'javascript', 'java']
-count_words(subreddit_name, keywords)
+        return count_words(subreddit, word_list, word_count,
+                           info.get("data").get("after"))
