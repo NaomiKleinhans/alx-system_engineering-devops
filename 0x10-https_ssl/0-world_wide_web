@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Takes a subdomain and a domain and returns information about the subdomain
+# This script takes a subdomain and a domain and returns information about the subdomain
 
 # Function to get and print subdomain information
 get_subdomain_info() {
@@ -18,9 +18,16 @@ get_subdomain_info() {
 }
 
 # Main script logic
+if [ "$#" -lt 1 ]; then
+    echo "Usage: $0 DOMAIN [SUBDOMAIN]"
+    echo "If SUBDOMAIN is not provided, the script will check a predefined list of subdomains."
+    exit 1
+fi
+
 DOMAIN=$1
 SUBDOMAIN=$2
 
+# Predefined list of subdomains
 SUBDOMAINS=("www" "lb-01" "web-01" "web-02")
 
 if [ -z "$SUBDOMAIN" ]; then
@@ -30,4 +37,3 @@ if [ -z "$SUBDOMAIN" ]; then
 else
     get_subdomain_info "$SUBDOMAIN" "$DOMAIN"
 fi
-
