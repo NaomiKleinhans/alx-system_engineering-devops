@@ -1,18 +1,17 @@
 #!/usr/bin/env bash
-# This script takes a subdomain and a domain and returns information about the subdomain
+# This script takes a domain and an optional subdomain and returns information about the subdomain
 
 # Function to get and print subdomain information
 get_subdomain_info() {
     local subdomain=$1
     local domain=$2
     local dig_output
-    dig_output=$(dig "$subdomain.$domain" ANY +noall +answer)
+    dig_output=$(dig "$subdomain.$domain" A +short)
 
     if [ -n "$dig_output" ]; then
-        local record_type
+        local record_type="A"
         local destination
-        record_type=$(echo "$dig_output" | awk '{print $4}' | head -n 1)
-        destination=$(echo "$dig_output" | awk '{print $5}' | head -n 1)
+        destination=$(echo "$dig_output" | head -n 1)
         echo "The subdomain $subdomain is a $record_type record and points to $destination"
     else
         echo "The subdomain $subdomain does not have any records."
