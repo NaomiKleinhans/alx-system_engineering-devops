@@ -1,37 +1,29 @@
 #!/usr/bin/python3
+"""For given employee ID, return TODO list progress"""
 
 import requests
 import sys
 
-# Accept Employee ID as a Command-Line Argument
-if len(sys.argv) != 2:
-    print("Usage: ./0-gather_data_from_an_API.py <employee_id>")
-    sys.exit(1)
+if __name__ == "__main__":
 
-employee_id = sys.argv[1]
+    userId = sys.argv[1]
+    user = requests.get("https://jsonplaceholder.typicode.com/users/{}"
+                        .format(userId))
 
-# Fetch Employee Data from the API
-base_url = "https://jsonplaceholder.typicode.com/"
-user_url = f"{base_url}users/{employee_id}"
-todos_url = f"{base_url}todos?userId={employee_id}"
+    name = user.json().get('name')
 
-user_response = requests.get(user_url)
-todos_response = requests.get(todos_url)
+    todos = requests.get('https://jsonplaceholder.typicode.com/todos')
+    totalTasks = 0
+    completed = 0
 
-if user_response.status_code != 200 or todos_response.status_code != 200:
-    print("Error: Unable to fetch data")
-    sys.exit(1)
+    for task in todos.json():
+        if task.get('userId') == int(userId):
+            totalTasks += 1
+            if task.get('completed'):
+                completed += 1
 
-user = user_response.json()
-todos = todos_response.json()
+    print('Employee {} is done with tasks({}/{}):'
+          .format(name, completed, totalTasks))
 
-# Process and Display the Data
-employee_name = user.get("name")
-total_tasks = len(todos)
-completed_tasks = [task for task in todos if task.get("completed")]
-num_completed_tasks = len(completed_tasks)
-
-print(
-    f"Employee {employee_name} is done with tasks({num_completed_tasks}/{total_tasks}):")
-for task in completed_tasks:
-    print(f"\t {task.get('title')}")
+    print('\n'.join(["\t " + task.get('title') for task in todos.json()
+          if task.get('userId') == int(userId) and task.get('completed')]))
