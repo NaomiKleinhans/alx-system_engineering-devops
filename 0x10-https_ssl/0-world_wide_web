@@ -1,40 +1,16 @@
 #!/usr/bin/env bash
 # This script takes a domain and an optional subdomain and returns information about the subdomain
 
-# Function to get and print subdomain information
-get_subdomain_info() {
-    local subdomain=$1
-    local domain=$2
-    local dig_output
-    dig_output=$(dig "$subdomain.$domain" A +short)
-
-    if [ -n "$dig_output" ]; then
-        local record_type="A"
-        local destination
-        destination=$(echo "$dig_output" | head -n 1)
-        echo "The subdomain $subdomain is a $record_type record and points to $destination"
-    else
-        echo "The subdomain $subdomain does not have any records."
-    fi
+print_info () {
+    dig "$1" | grep -A1 'ANSWER SECTION:' | sed -r "s/$1./$2/g" | awk -F" " ' NR==2 { print "The subdomain " $1 " is a " $4 " record and points to " $5 }'
 }
 
-# Main script logic
-if [ "$#" -lt 1 ]; then
-    echo "Usage: $0 DOMAIN [SUBDOMAIN]"
-    echo "If SUBDOMAIN is not provided, the script will check a predefined list of subdomains."
-    exit 1
-fi
-
-DOMAIN=$1
-SUBDOMAIN=$2
-
-# Predefined list of subdomains
-SUBDOMAINS=("www" "lb-01" "web-01" "web-02")
-
-if [ -z "$SUBDOMAIN" ]; then
-    for sub in "${SUBDOMAINS[@]}"; do
-        get_subdomain_info "$sub" "$DOMAIN"
-    done
+if [ "$#" -eq 2 ]
+then
+    print_info "$2.$1" "$2"
 else
-    get_subdomain_info "$SUBDOMAIN" "$DOMAIN"
+    print_info "www.$1" "www"
+    print_info "lb-01.$1" "lb-01"
+    print_info "web-01.$1" "web-01"
+    print_info "web-02.$1" "web-02"
 fi
