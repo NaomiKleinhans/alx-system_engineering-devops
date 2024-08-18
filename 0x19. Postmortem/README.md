@@ -1,5 +1,3 @@
-
-🛠 Postmortem Title:
 "Emoji-geddon: The Great Emoji Escape of 2024"
 "The day our emails lost their smiles!"
 
