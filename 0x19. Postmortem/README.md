@@ -1,13 +1,13 @@
 
 🛠 Postmortem Title:
-"Emoji-geddon: The Great Emoji Escape of 2023"
+"Emoji-geddon: The Great Emoji Escape of 2024"
 "The day our emails lost their smiles!"
 
 ![Emoji](emoji.jpg)
 
 
 Issue Summary:
-Duration: August 8th, 2023, 15:00 - August 9th, 2023, 09:30 (UTC)
+Duration: August 8th, 2024, 15:00 - August 9th, 2024, 09:30 (UTC)
 Impact: HTML mail service turned into a "no-emoji" zone, leading to slower load times and frustrated users trying to decipher emotionless emails. Approximately 30% of users were affected and faced a serious case of emoji withdrawal.
 Root Cause: The root cause was traced back to an adventurous emoji CDN that decided to take an unannounced vacation, leaving our emails feeling cold and impersonal.
 Timeline:
