@@ -19,7 +19,7 @@
 server {
     # Listen on port 80 for IPv4 and IPv6
     listen 80 default_server;
-    listen [::]:80 default_server;
+     server_name <54.227.221.89>;
 
     # Root directory for serving static files
     root /var/www/html;
